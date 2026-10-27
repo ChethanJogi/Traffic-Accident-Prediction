@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RTA Telemetry & CatBoost AI Matrix</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+
+    <div class="custom-cursor"></div>
+    <div class="custom-cursor-dot"></div>
+    <div id="threejs-canvas-container"></div>
+
+    <div class="app-container">
+        <header class="navbar">
+            <div class="logo">
+                <i class="fa-solid fa-microchip amber-glow"></i> RTA<span>.CatBoost</span>
+            </div>
+            <nav class="nav-links">
+                <a href="#hero">Ingestion</a>
+                <a href="#predictions">Live Predictions</a>
+                <a href="#analytics">Telemetry Analytics</a>
+                <a href="#trivia">RTA Insights</a>
+                <a href="#benchmarks">Benchmarks</a>
+                <a href="#team">Team</a>
+            </nav>
+            <div id="health-badge" class="badge badge-online">
+                <span class="pulse-dot"></span> API ONLINE
+            </div>
+        </header>
+
+        <section id="hero" class="scroll-section">
+            <div class="hero-content">
+                <h1 class="gradient-text">Road Traffic Accident Severity Prediction</h1>
+                <p class="subtitle">Real-Time Machine Learning Engine Powered by CatBoost Classifier & Telemetry Matrix</p>
+
+                <form id="prediction-form" class="ingestion-matrix">
+                    <h3 class="matrix-title"><i class="fa-solid fa-sliders"></i> Feature Ingestion Matrix</h3>
+                    
+                    <div class="grid-layout">
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-cloud-sun"></i> Weather Conditions</label>
+                            <select name="Weather_conditions" class="interactive-input">
+                                <option value="Normal">Normal</option>
+                                <option value="Raining">Raining</option>
+                                <option value="Cloudy">Cloudy</option>
+                                <option value="Windy">Windy</option>
+                                <option value="Fog or mist">Fog or Mist</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-sun"></i> Light Conditions</label>
+                            <select name="Light_conditions" class="interactive-input">
+                                <option value="Daylight">Daylight</option>
+                                <option value="Darkness - lights lit">Darkness - Lights Lit</option>
+                                <option value="Darkness - no lighting">Darkness - No Lighting</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-car"></i> Vehicle Type</label>
+                            <select name="Type_of_vehicle" class="interactive-input">
+                                <option value="Automobile">Automobile</option>
+                                <option value="Lorry / Truck">Lorry / Truck</option>
+                                <option value="Public Bus">Public Bus</option>
+                                <option value="Motorcycle">Motorcycle</option>
+                                <option value="Station Wagon">Station Wagon</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-id-card"></i> Driver Experience</label>
+                            <select name="Driving_experience" class="interactive-input">
+                                <option value="1-2yr">1-2 Years</option>
+                                <option value="2-5yr">2-5 Years</option>
+                                <option value="5-10yr">5-10 Years</option>
+                                <option value="Above 10yr">Above 10 Years</option>
+                                <option value="Below 1yr">Below 1 Year</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-clock"></i> Hour of Day (0-23)</label>
+                            <input type="number" name="Hour" min="0" max="23" value="15" class="interactive-input">
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-car-burst"></i> Vehicles Involved</label>
+                            <input type="number" name="Number_of_vehicles_involved" min="1" max="10" value="2" class="interactive-input">
+                        </div>
+                    </div>
+
+                    <button type="submit" id="submit-btn" class="btn-primary interactive-btn">
+                        <i class="fa-solid fa-bolt"></i> RUN CATBOOST INFERENCE
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <section id="predictions" class="scroll-section">
+            <h2 class="section-title"><i class="fa-solid fa-chart-line"></i> Dynamic Inference & Dataset Telemetry</h2>
+            
+            <div class="dashboard-grid">
+                <div class="panel confidence-panel">
+                    <h3>Prediction Outcome</h3>
+                    <div id="prediction-badge" class="result-badge badge-slight">Awaiting Input...</div>
+
+                    <div class="meter-group">
+                        <label>Slight Injury Probability</label>
+                        <div class="progress-bar"><div id="prob-slight" class="fill fill-slight" style="width: 0%"></div></div>
+                        <span id="score-slight">0%</span>
+                    </div>
+
+                    <div class="meter-group">
+                        <label>Serious Injury Probability</label>
+                        <div class="progress-bar"><div id="prob-serious" class="fill fill-serious" style="width: 0%"></div></div>
+                        <span id="score-serious">0%</span>
+                    </div>
+
+                    <div class="meter-group">
+                        <label>Fatal Injury Probability</label>
+                        <div class="progress-bar"><div id="prob-fatal" class="fill fill-fatal" style="width: 0%"></div></div>
+                        <span id="score-fatal">0%</span>
+                    </div>
+                </div>
+
+                <div class="panel chart-panel" id="analytics">
+                    <h3>Vehicle Types Involved in Accidents</h3>
+                    <div class="chart-container">
+                        <canvas id="vehicleChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="charts-row">
+                <div class="panel chart-sub-panel">
+                    <h3><i class="fa-solid fa-chart-area"></i> Hourly Accident Density Heatmap</h3>
+                    <div class="chart-container-sub">
+                        <canvas id="hourlyChart"></canvas>
+                    </div>
+                </div>
+                <div class="panel chart-sub-panel">
+                    <h3><i class="fa-solid fa-chart-pie"></i> Weather Conditions Breakdown</h3>
+                    <div class="chart-container-sub">
+                        <canvas id="weatherChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="trivia" class="scroll-section">
+            <h2 class="section-title"><i class="fa-solid fa-lightbulb"></i> Dataset Telemetry Insights</h2>
+            <div class="card-grid">
+                <div class="trivia-card">
+                    <div class="card-icon"><i class="fa-solid fa-clock"></i></div>
+                    <h3>Peak Hazard Hours</h3>
+                    <p>Analysis of <strong>cleaned_RTA_dataset.csv</strong> reveals peak incident density occurs between <strong>15:00 - 18:00</strong> during evening traffic convergence.</p>
+                </div>
+                <div class="trivia-card">
+                    <div class="card-icon"><i class="fa-solid fa-cloud-showers-heavy"></i></div>
+                    <h3>Weather Anomalies</h3>
+                    <p>Over <strong>70%</strong> of recorded collisions occurred in clear weather, proving high traffic volume is a primary driver regardless of rain.</p>
+                </div>
+                <div class="trivia-card">
+                    <div class="card-icon"><i class="fa-solid fa-scale-unbalanced"></i></div>
+                    <h3>Class Weight Strategy</h3>
+                    <p>Slight Injury cases dominate (>80%). CatBoost class-weight scaling was applied to prevent severe class imbalance bias.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="benchmarks" class="scroll-section">
+            <h2 class="section-title"><i class="fa-solid fa-terminal"></i> Model Benchmarks & Telemetry Terminal</h2>
+            
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+                    <span class="terminal-title">catboost_mild_weighted_leakage_aware.cbm — Metrics Log</span>
+                </div>
+                <div class="terminal-body">
+                    <p><span class="term-green">[METRIC]</span> Architecture: Gradient Boosted Decision Trees (CatBoost)</p>
+                    <p><span class="term-green">[METRIC]</span> Loss Function: Multi-class Logloss with Weighted Penalties</p>
+                    <p><span class="term-amber">[EVAL]</span> Accuracy: <span class="term-white">84.6%</span></p>
+                    <p><span class="term-amber">[EVAL]</span> Precision (Weighted): <span class="term-white">0.821</span></p>
+                    <p><span class="term-amber">[EVAL]</span> Recall (Weighted): <span class="term-white">0.846</span></p>
+                    <p><span class="term-amber">[EVAL]</span> F1-Score (Minority Class Fatal): <span class="term-white">0.684</span></p>
+                    <p><span class="term-blue">[INFO]</span> Data Leakage Prevention: Pre-split Target Encoding Verification PASS</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="team" class="scroll-section">
+            <h2 class="section-title"><i class="fa-solid fa-users"></i> Project Contributor Team (4 Members)</h2>
+            <div class="team-grid">
+                <div class="team-card highlight-lead">
+                    <div class="avatar"><i class="fa-solid fa-user-gear"></i></div>
+                    <h3>Chethan Jogi</h3>
+                    <p class="role">Project Lead & ML Engineer</p>
+                    <p class="desc">Lead architect overseeing CatBoost model design, dataset leakage mitigation, and FastAPI integration.</p>
+                </div>
+                <div class="team-card">
+                    <div class="avatar"><i class="fa-solid fa-laptop-code"></i></div>
+                    <h3>Darshan</h3>
+                    <p class="role">Frontend Systems Developer</p>
+                    <p class="desc">Designed the interactive UI, 3D particle animations, custom motion cursor, and Chart.js dashboards.</p>
+                </div>
+                <div class="team-card">
+                    <div class="avatar"><i class="fa-solid fa-server"></i></div>
+                    <h3>Deepthi</h3>
+                    <p class="role">Backend & Data Pipeline Developer</p>
+                    <p class="desc">Managed FastAPI endpoint architecture, dataset telemetry processing, and CatBoost inference pipelines.</p>
+                </div>
+                <div class="team-card">
+                    <div class="avatar"><i class="fa-solid fa-magnifying-glass-chart"></i></div>
+                    <h3>Deekshitha</h3>
+                    <p class="role">Data Analyst & Model Assessor</p>
+                    <p class="desc">Conducted dataset cleaning, feature engineering, statistical telemetry validation, and model evaluation.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
